@@ -7,6 +7,7 @@ rc('text', usetex=True)
 import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 from sklearn.metrics import mean_squared_error
+import time
 
 
 def pearson_r2_score(y, y_pred):
@@ -56,13 +57,14 @@ with tf.name_scope("summaries"):
 train_writer = tf.summary.FileWriter('/tmp/lr-train', tf.get_default_graph())
 
 n_steps = 10000
+start = time.time()
 with tf.Session() as sess:
   sess.run(tf.global_variables_initializer())
   # Train model
   for i in range(n_steps):
     feed_dict = {x: x_np, y: y_np}
     _, summary, loss = sess.run([train_op, merged, l], feed_dict=feed_dict)
-    print("step %d, loss: %f" % (i, loss))
+    #print("step %d, loss: %f" % (i, loss))
     train_writer.add_summary(summary, i)
 
   # Get weights
@@ -71,6 +73,8 @@ with tf.Session() as sess:
 
   # Make Predictions
   y_pred_np = sess.run(y_pred, feed_dict={x: x_np})
+end = time.time()
+print("Time taken for learning: {}".format(end-start))
 
 r2 = pearson_r2_score(y_np, y_pred_np)
 print("Pearson R^2: %f" % r2)
